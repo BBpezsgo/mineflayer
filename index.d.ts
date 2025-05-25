@@ -16,10 +16,11 @@ export function createBot (options: { client: Client } & Partial<BotOptions>): B
 export function createBot (options: BotOptions): Bot
 
 export interface BotOptions extends ClientOptions {
+  storageBuilder?: (options: { version: string; worldName: string; }) => import('prismarine-world').world.StorageProvider
   logErrors?: boolean
   hideErrors?: boolean
   loadInternalPlugins?: boolean
-  plugins?: PluginOptions
+  plugins?: InternalPlugins | ExternalPlugins
   chat?: ChatLevel
   colorsEnabled?: boolean
   viewDistance?: ViewDistance
@@ -35,13 +36,60 @@ export interface BotOptions extends ClientOptions {
   respawn?: boolean
 }
 
+type InternalPlugin =
+  'bed' |
+  'title' |
+  'block_actions' |
+  'blocks' |
+  'book' |
+  'boss_bar' |
+  'breath' |
+  'chat' |
+  'chest' |
+  'command_block' |
+  'craft' |
+  'creative' |
+  'digging' |
+  'enchantment_table' |
+  'entities' |
+  'experience' |
+  'explosion' |
+  'fishing' |
+  'furnace' |
+  'game' |
+  'health' |
+  'inventory' |
+  'kick' |
+  'physics' |
+  'place_block' |
+  'rain' |
+  'ray_trace' |
+  'resource_pack' |
+  'scoreboard' |
+  'team' |
+  'settings' |
+  'simple_inventory' |
+  'sound' |
+  'spawn_point' |
+  'tablist' |
+  'time' |
+  'villager' |
+  'anvil' |
+  'place_entity' |
+  'generic_place' |
+  'particle'
+
 export type ChatLevel = 'enabled' | 'commandsOnly' | 'disabled'
 export type ViewDistance = 'far' | 'normal' | 'short' | 'tiny' | number
 export type MainHands = 'left' | 'right'
 
-export interface PluginOptions {
-  [plugin: string]: boolean | Plugin
+export type ExternalPlugins = {
+  [plugin: string]: Plugin
 }
+
+export type InternalPlugins = Partial<{
+  [plugin in InternalPlugin]: boolean
+}>
 
 export type Plugin = (bot: Bot, options: BotOptions) => void
 
@@ -750,7 +798,7 @@ export class EnchantmentTable extends Window<ConditionalStorageEvents> {
   putLapis (item: Item): Promise<Item>;
 }
 
-export class Anvil {
+export class Anvil extends Window {
   combine (itemOne: Item, itemTwo: Item, name?: string): Promise<void>
   rename (item: Item, name?: string): Promise<void>
 }
