@@ -373,7 +373,7 @@ export interface Bot extends TypedEmitter<BotEvents> {
 
   placeEntity: (referenceBlock: Block, faceVector: Vec3) => Promise<Entity>
 
-  activateBlock: (block: Block, direction?: Vec3, cursorPos?: Vec3) => Promise<void>
+  activateBlock: (block: Block, direction?: Vec3, cursorPos?: Vec3, forceLook?: boolean) => Promise<void>
 
   activateEntity: (entity: Entity) => Promise<void>
 
@@ -423,6 +423,8 @@ export interface Bot extends TypedEmitter<BotEvents> {
   openEnchantmentTable: (enchantmentTable: Block) => Promise<EnchantmentTable>
 
   openAnvil: (anvil: Block) => Promise<Anvil>
+
+  openBrewingStand: (brewingStandBlock: Block) => Promise<BrewingStand>
 
   openVillager: (
     villager: Entity
@@ -801,6 +803,26 @@ export class EnchantmentTable extends Window<ConditionalStorageEvents> {
 export class Anvil extends Window {
   combine (itemOne: Item, itemTwo: Item, name?: string): Promise<void>
   rename (item: Item, name?: string): Promise<void>
+}
+
+export class BrewingStand extends Window<{
+  brewingStopped: () => void,
+  update: () => void,
+  close: () => void,
+}> {
+  fuel: any | null
+  progress: number
+  progressSeconds: number
+  takeIngredient(): Promise<Item>
+  takeFuel(): Promise<Item>
+  takePotion(slot: number): Promise<Item>
+  takePotions(): Promise<[] | [Item] | [Item, Item] | [Item, Item, Item]>
+  putIngredient(itemType: number, metadata: any, count: number): Promise<void>
+  putFuel(itemType: number, metadata: any, count: number): Promise<void>
+  putPotion(slot: number, itemType: number, metadata: any, count: number): Promise<void>
+  ingredientItem(): Item | undefined
+  fuelItem(): Item | undefined
+  potions(): [Item | undefined, Item | undefined, Item | undefined]
 }
 
 export interface Enchantment {
